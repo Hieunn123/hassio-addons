@@ -40,23 +40,23 @@ from(bucket: "{BUCKET}")
         },
         data=flux
     )
+
     if resp.status_code != 200:
         raise HTTPException(status_code=500, detail="Lỗi truy vấn InfluxDB")
 
     lines = resp.text.strip().splitlines()
-if len(lines) < 2:
-    raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
+    if len(lines) < 2:
+        raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
 
-headers = lines[0].split(",")
-values = lines[1].split(",")
-row = dict(zip(headers, values))
-stored_hash = row.get("password_hash", "")
+    headers = lines[0].split(",")
+    for line in lines[1:]:
+        values = line.split(",")
+        row = dict(zip(headers, values))
+        stored_hash = row.get("password_hash", "")
+        if stored_hash and bcrypt.checkpw(data.password.encode(), stored_hash.encode()):
+            return {"token": f"mock-token-for-{data.email}"}
 
-if not stored_hash:
-    raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
-
-    if not bcrypt.checkpw(data.password.encode(), stored_hash.encode()):
-        raise HTTPException(status_code=401, detail="Sai mật khẩu")
+    raise HTTPException(status_code=401, detail="Sai mật khẩu")
 
     return {"token": f"mock-token-for-{data.email}"}
 
