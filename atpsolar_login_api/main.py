@@ -24,10 +24,14 @@ class RegisterRequest(BaseModel):
 
 @app.post("/login")
 def login(data: LoginRequest):
-    flux = f'''from(bucket: "{BUCKET}")
-      |> range(start: -30d)
-      |> filter(fn: (r) => r._measurement == "user" and r["email"] == "{data.email}")
-    '''
+    flux = f'''
+from(bucket: "{BUCKET}")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "user")
+  |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+  |> filter(fn: (r) => r.email == "{data.email}")
+'''
+
     resp = requests.post(
         f"{INFLUX_URL}/api/v2/query?org={INFLUX_ORG}",
         headers={
