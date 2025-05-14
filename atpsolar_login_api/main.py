@@ -43,12 +43,18 @@ from(bucket: "{BUCKET}")
     if resp.status_code != 200:
         raise HTTPException(status_code=500, detail="Lỗi truy vấn InfluxDB")
 
-    records = resp.text.splitlines()
-    hash_line = [line for line in records if "_field,password_hash" in line]
-    if not hash_line:
-        raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
+    lines = resp.text.strip().splitlines()
+if len(lines) < 2:
+    raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
 
-    stored_hash = hash_line[-1].split(",")[-1]
+headers = lines[0].split(",")
+values = lines[1].split(",")
+row = dict(zip(headers, values))
+stored_hash = row.get("password_hash", "")
+
+if not stored_hash:
+    raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
+
     if not bcrypt.checkpw(data.password.encode(), stored_hash.encode()):
         raise HTTPException(status_code=401, detail="Sai mật khẩu")
 
