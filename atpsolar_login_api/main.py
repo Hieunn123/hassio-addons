@@ -26,7 +26,7 @@ class RegisterRequest(BaseModel):
 def login(data: LoginRequest):
     flux = f'''from(bucket: "{BUCKET}")
       |> range(start: -30d)
-      |> filter(fn: (r) => r._measurement == "user" and r.email == "{data.email}")
+      |> filter(fn: (r) => r._measurement == "user" and r["email"] == "{data.email}")
     '''
     resp = requests.post(
         f"{INFLUX_URL}/api/v2/query?org={INFLUX_ORG}",
