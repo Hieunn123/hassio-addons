@@ -12,6 +12,6 @@ ports:
 environment:
   INFLUX_URL: "http://192.168.100.5:8086"
   INFLUX_ORG: "atpsolar"
-  INFLUX_TOKEN: "S_3fQhpncK358qmB-dmme3ZMdrPDS-XI5cse2NtDXftZPSwMA5vtENjH3k-a0YKlbOjs1wCtGhIrbLmVkCwQEQ=="
+  INFLUX_TOKEN: "Oc_-S_JiIJTr0Nu_z59zJfzrV42ZbrZqrBwlIAHvcIczpPf7RrYF2NnIQ9nobSMzFsn1MrIPSA12FhAXFq8uhQ=="
 build_from:
   aarch64: "Dockerfile"
