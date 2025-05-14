@@ -1,0 +1,17 @@
+name: "ATPsolar Login API"
+version: "1.0"
+slug: "atpsolar_login_api"
+description: "FastAPI backend cho quyen lay nguoi dung trong InfluxDB"
+arch:
+  - aarch64
+startup: application
+boot: auto
+init: false
+ports:
+  8000/tcp: 8000
+environment:
+  INFLUX_URL: "http://127.0.0.1:8086"
+  INFLUX_ORG: "atpsolar"
+  INFLUX_TOKEN: "S_3fQhpncK358qmB-dmme3ZMdrPDS-XI5cse2NtDXftZPSwMA5vtENjH3k-a0YKlbOjs1wCtGhIrbLmVkCwQEQ=="
+build_from:
+  aarch64: "Dockerfile"
