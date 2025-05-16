@@ -1,5 +1,5 @@
 name: "ATPsolar Login API"
-version: "1.0.1"
+version: "1.2"
 slug: "atpsolar_login_api"
 description: "FastAPI backend cho quyen lay nguoi dung trong InfluxDB"
 arch:
