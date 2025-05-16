@@ -10,7 +10,7 @@ init: false
 ports:
   8000/tcp: 8000
 environment:
-  MYSQL_HOST: "addon_core-mariadb"
+  MYSQL_HOST: "addon_core_mariadb"
   MYSQL_PORT: "3306"
   MYSQL_USER: "hieunn"
   MYSQL_PASSWORD: "Hieu987456321#$"
