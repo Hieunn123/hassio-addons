@@ -1,8 +1,11 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship, Session
+from fastapi import FastAPI, HTTPException, Depends
+from pydantic import BaseModel
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker, declarative_base, Session
+import bcrypt
 import os
 
+# ENV
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_HOST = os.getenv("MYSQL_HOST")
@@ -11,6 +14,7 @@ MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 
 DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
+# SQLAlchemy setup
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
 Base = declarative_base()
@@ -18,28 +22,16 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    email = Column(String(255), unique=True)
-    password_hash = Column(String(255))
+    email = Column(String(255), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
     phone = Column(String(50))
     role = Column(String(50))
-    access = relationship("UserSiteAccess", back_populates="user")
 
-class Site(Base):
-    __tablename__ = "sites"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255))
-    bucket_name = Column(String(255))
-    location = Column(String(255))
-    total_power = Column(Integer)
-    access = relationship("UserSiteAccess", back_populates="site")
+class LoginRequest(BaseModel):
+    email: str
+    password: str
 
-class UserSiteAccess(Base):
-    __tablename__ = "user_site_access"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    site_id = Column(Integer, ForeignKey("sites.id"))
-    user = relationship("User", back_populates="access")
-    site = relationship("Site", back_populates="access")
+app = FastAPI()
 
 def get_db():
     db = SessionLocal()
@@ -48,9 +40,20 @@ def get_db():
     finally:
         db.close()
 
-app = FastAPI()
+@app.post("/login")
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter_by(email=data.email).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Tài khoản không tồn tại")
+    if not bcrypt.checkpw(data.password.encode(), user.password_hash.encode()):
+        raise HTTPException(status_code=401, detail="Sai mật khẩu")
+    return {
+        "token": f"mock-token-for-{user.email}",
+        "email": user.email,
+        "role": user.role,
+        "user_id": user.id
+    }
 
 @app.get("/")
-def read_root():
-    return {"message": "ATPsolar Login API with MySQL is running"}
-
+def root():
+    return {"message": "Login API with MySQL is ready"}
