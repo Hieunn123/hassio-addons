@@ -10,8 +10,8 @@ init: false
 ports:
   8000/tcp: 8000
 environment:
-  INFLUX_URL: "http://192.168.100.5:8086"
-  INFLUX_ORG: "atpsolar"
-  INFLUX_TOKEN: "Oc_-S_JiIJTr0Nu_z59zJfzrV42ZbrZqrBwlIAHvcIczpPf7RrYF2NnIQ9nobSMzFsn1MrIPSA12FhAXFq8uhQ=="
-build_from:
-  aarch64: "Dockerfile"
+  MYSQL_HOST: "addon_core-mariadb"
+  MYSQL_PORT: "3306"
+  MYSQL_USER: "hieunn"
+  MYSQL_PASSWORD: "Hieu987456321#$"
+  MYSQL_DATABASE: "atpsolar"
